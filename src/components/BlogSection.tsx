@@ -1,7 +1,12 @@
+"use client";
+
 import React from 'react';
 import GlassCard from './GlassCard';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function BlogSection() {
+  const { t } = useLanguage();
+
   // Placeholder structure for future Markdown or CMS integration
   const posts = [
     {
@@ -35,13 +40,13 @@ export default function BlogSection() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Latest Writing</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{t.blog.title}</h2>
             <p className="text-slate-600 max-w-2xl">
-              Thoughts, tutorials, and reflections on AI, software engineering, and design.
+              {t.blog.subtitle}
             </p>
           </div>
           <a href="#" className="hidden md:inline-flex items-center text-amber-600 font-medium hover:text-amber-700 transition-colors cursor-pointer">
-            View all posts
+            {t.blog.viewAll}
             <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
@@ -74,7 +79,7 @@ export default function BlogSection() {
         
         <div className="mt-8 text-center md:hidden">
           <a href="#" className="inline-flex items-center text-amber-600 font-medium hover:text-amber-700 transition-colors">
-            View all posts
+            {t.blog.viewAll}
             <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

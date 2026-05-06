@@ -1,7 +1,12 @@
+"use client";
+
 import React from 'react';
 import GlassCard from './GlassCard';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function ToolGrid() {
+  const { t } = useLanguage();
+
   const tools = [
     {
       id: 'ai-translator',
@@ -9,7 +14,7 @@ export default function ToolGrid() {
       description: 'A lightning-fast, highly accurate document translation tool powered by MiniMax models.',
       url: 'https://aitranslator.justganit.com/',
       icon: '🌐',
-      status: 'Live',
+      status: t.tools.statusLive,
     },
     {
       id: 'douyin-scraper',
@@ -17,16 +22,16 @@ export default function ToolGrid() {
       description: 'Advanced data extraction pipeline for Douyin (TikTok China) analytics and insights.',
       url: '#',
       icon: '📊',
-      status: 'Coming Soon',
+      status: t.tools.statusSoon,
     },
   ];
 
   return (
     <section id="tools" className="w-full py-20 px-4 max-w-6xl mx-auto">
       <div className="text-center mb-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">AI Toolkit</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">{t.tools.title}</h2>
         <p className="text-slate-600 max-w-2xl mx-auto">
-          Explore the suite of tools and applications I've built to solve real-world problems.
+          {t.tools.subtitle}
         </p>
       </div>
 
@@ -42,7 +47,7 @@ export default function ToolGrid() {
             <GlassCard hoverable className="h-full flex flex-col relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4">
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                  tool.status === 'Live' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                  tool.status === t.tools.statusLive ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                 }`}>
                   {tool.status}
                 </span>
@@ -58,7 +63,7 @@ export default function ToolGrid() {
               </p>
               
               <div className="mt-8 flex items-center text-amber-600 font-medium">
-                {tool.url !== '#' ? 'Launch Tool' : 'Learn More'}
+                {tool.url !== '#' ? t.tools.launch : t.tools.learnMore}
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -74,8 +79,8 @@ export default function ToolGrid() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-slate-700 mb-2">More coming soon</h3>
-          <p className="text-slate-500 text-sm">Working on new ideas...</p>
+          <h3 className="text-xl font-bold text-slate-700 mb-2">{t.tools.comingSoon}</h3>
+          <p className="text-slate-500 text-sm">{t.tools.workingOn}</p>
         </div>
       </div>
     </section>
