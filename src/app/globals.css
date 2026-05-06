@@ -102,7 +102,8 @@
     );
     z-index: -1;
     pointer-events: none;
-    transition: opacity 0.3s;
+    opacity: var(--nav-spotlight-opacity, 0);
+    transition: opacity 0.5s ease;
   }
   
   .dark .nav-spotlight::before {

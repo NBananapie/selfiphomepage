@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import MouseTracker from "@/components/MouseTracker";
+import ParticleBackground from "@/components/ParticleBackground";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <LanguageProvider>
             <MouseTracker />
+            <ParticleBackground />
             {/* Ambient Background Elements */}
             <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
               <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-amber-200/40 dark:bg-amber-600/20 blur-3xl animate-blob" />

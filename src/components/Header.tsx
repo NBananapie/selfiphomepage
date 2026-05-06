@@ -35,10 +35,20 @@ export default function Header() {
     e.currentTarget.style.setProperty('--nav-mouse-y', `${y}px`);
   };
 
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.setProperty('--nav-spotlight-opacity', `1`);
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.setProperty('--nav-spotlight-opacity', `0`);
+  };
+
   return (
     <header className="fixed top-0 w-full z-50 px-4 py-4 pointer-events-none">
       <div 
         onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="max-w-6xl mx-auto flex justify-between items-center liquid-glass nav-spotlight rounded-full px-6 py-3 pointer-events-auto"
       >
         <div 
