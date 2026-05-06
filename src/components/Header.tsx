@@ -27,10 +27,20 @@ export default function Header() {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--nav-mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--nav-mouse-y', `${y}px`);
+  };
+
   return (
-    <header className="fixed top-0 w-full z-50 px-4 py-4">
-      <div className="max-w-6xl mx-auto flex justify-between items-center liquid-glass nav-spotlight rounded-full px-6 py-3">
-        {/* Logo / Avatar */}
+    <header className="fixed top-0 w-full z-50 px-4 py-4 pointer-events-none">
+      <div 
+        onMouseMove={handleMouseMove}
+        className="max-w-6xl mx-auto flex justify-between items-center liquid-glass nav-spotlight rounded-full px-6 py-3 pointer-events-auto"
+      >
         <div 
           className="flex items-center space-x-3 cursor-pointer group"
           onClick={scrollToTop}

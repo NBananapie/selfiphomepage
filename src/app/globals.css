@@ -96,8 +96,8 @@
     position: absolute;
     inset: 0;
     background: radial-gradient(
-      400px circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px),
-      rgba(255, 255, 255, 0.25),
+      600px circle at var(--nav-mouse-x, -1000px) var(--nav-mouse-y, -1000px),
+      rgba(255, 255, 255, 0.45),
       transparent 40%
     );
     z-index: -1;
@@ -107,18 +107,20 @@
   
   .dark .nav-spotlight::before {
     background: radial-gradient(
-      400px circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px),
-      rgba(250, 204, 21, 0.2),
+      600px circle at var(--nav-mouse-x, -1000px) var(--nav-mouse-y, -1000px),
+      rgba(250, 204, 21, 0.35),
       transparent 40%
     );
   }
 
   .global-spotlight {
-    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 70%);
+    backdrop-filter: blur(4px) contrast(1.1) saturate(1.2);
+    -webkit-backdrop-filter: blur(4px) contrast(1.1) saturate(1.2);
   }
 
   .dark .global-spotlight {
-    background: radial-gradient(circle, rgba(250, 204, 21, 0.25) 0%, rgba(250, 204, 21, 0) 70%);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.4) 0%, rgba(250, 204, 21, 0) 70%);
   }
 
   .animate-blob {
