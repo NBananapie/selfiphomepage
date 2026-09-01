@@ -20,7 +20,7 @@ export const translations = {
         {
           id: 'ai-translator',
           name: 'AI Translator',
-          description: 'A lightning-fast, highly accurate document translation tool powered by MiniMax models.',
+          description: 'A lightning-fast, highly accurate document and PDF translation tool powered by state-of-the-art LLMs.',
           url: 'https://aitranslator.justganit.com/',
           icon: '🌐',
           statusKey: 'statusLive',
@@ -126,7 +126,7 @@ export const translations = {
         {
           id: 'ai-translator',
           name: 'AI 沉浸式翻译',
-          description: '基于 MiniMax 大模型驱动的极速、高精度的文档与 PDF 翻译工具。',
+          description: '基于前沿大语言模型（LLM）驱动的极速、高精度的文档与 PDF 沉浸式翻译工具。',
           url: 'https://aitranslator.justganit.com/',
           icon: '🌐',
           statusKey: 'statusLive',
