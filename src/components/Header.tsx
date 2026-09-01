@@ -10,9 +10,15 @@ export default function Header() {
   const { language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 30);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollToTop = () => {
@@ -44,12 +50,16 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 px-4 py-4 pointer-events-none">
+    <header className="fixed top-0 w-full z-50 px-4 py-3 sm:py-4 pointer-events-none transition-all duration-500">
       <div 
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="max-w-6xl mx-auto flex justify-between items-center liquid-glass nav-spotlight rounded-full px-6 py-3 pointer-events-auto"
+        className={`mx-auto flex justify-between items-center liquid-glass nav-spotlight rounded-full px-5 sm:px-6 pointer-events-auto transition-all duration-500 ${
+          isScrolled 
+            ? 'max-w-4xl py-2 shadow-xl bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl' 
+            : 'max-w-6xl py-3 shadow-sm bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl'
+        }`}
       >
         <div 
           className="flex items-center space-x-3 cursor-pointer group"

@@ -24,12 +24,12 @@ export default function MouseTracker() {
 
   return (
     <div 
-      className="global-spotlight pointer-events-none fixed z-[100] rounded-full -translate-x-1/2 -translate-y-1/2 mix-blend-overlay hidden md:block transition-opacity duration-300 ease-out"
+      className="global-spotlight pointer-events-none fixed z-10 rounded-full -translate-x-1/2 -translate-y-1/2 hidden md:block transition-all duration-300 ease-out"
       style={{ 
         left: `${position.x}px`, 
         top: `${position.y}px`,
-        width: isHoveringNav ? '0px' : '500px',
-        height: isHoveringNav ? '0px' : '500px',
+        width: isHoveringNav ? '0px' : '650px',
+        height: isHoveringNav ? '0px' : '650px',
         opacity: isHoveringNav ? 0 : 1,
       }}
     />

@@ -16,14 +16,14 @@ export default function GlassCard({ children, className = '', hoverable = false 
   if (hoverable) {
     return (
       <Tilt
-        tiltMaxAngleX={5}
-        tiltMaxAngleY={5}
+        tiltMaxAngleX={4}
+        tiltMaxAngleY={4}
         glareEnable={true}
-        glareMaxOpacity={0.15}
-        glareColor="white"
+        glareMaxOpacity={0.08}
+        glareColor="rgba(255, 255, 255, 0.6)"
         glarePosition="all"
-        scale={1.02}
-        transitionSpeed={2500}
+        scale={1.015}
+        transitionSpeed={2000}
         className="h-full rounded-3xl"
         glareBorderRadius="1.5rem"
       >

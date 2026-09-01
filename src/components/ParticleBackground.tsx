@@ -73,9 +73,12 @@ export default function ParticleBackground() {
     let particles: Particle[] = [];
     let mouseX = -1000;
     let mouseY = -1000;
+    let lastScrollY = window.scrollY;
+    let scrollVelocity = 0;
     
-    const lightColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#5f6368'];
-    const darkColors = ['#FACC15', '#22d3ee', '#e879f9', '#94a3b8'];
+    // Sophisticated, soft palettes
+    const lightColors = ['#F59E0B', '#FBBF24', '#38BDF8', '#818CF8', '#E2E8F0'];
+    const darkColors = ['#FACC15', '#F59E0B', '#38BDF8', '#C084FC', '#475569'];
     const colors = theme === 'dark' ? darkColors : lightColors;
 
     const resize = () => {
@@ -86,7 +89,8 @@ export default function ParticleBackground() {
 
     const initParticles = () => {
       particles = [];
-      const particleCount = Math.floor((canvas.width * canvas.height) / 10000); 
+      const density = theme === 'dark' ? 11000 : 13000; // slightly cleaner density in light mode
+      const particleCount = Math.floor((canvas.width * canvas.height) / density); 
       for (let i = 0; i < particleCount; i++) {
         particles.push(new Particle(canvas.width, canvas.height, colors));
       }
@@ -101,10 +105,22 @@ export default function ParticleBackground() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      scrollVelocity = (currentScrollY - lastScrollY) * 0.15;
+      lastScrollY = currentScrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     const render = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
+      // Decay scroll velocity smoothly
+      scrollVelocity *= 0.92;
+
       particles.forEach((particle) => {
+        // Apply vertical scroll parallax
+        particle.y -= scrollVelocity * (particle.radius * 0.5);
         particle.update(canvas.width, canvas.height);
         particle.draw(ctx, mouseX, mouseY);
       });
@@ -117,6 +133,7 @@ export default function ParticleBackground() {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(animationFrameId);
     };
   }, [theme]);
@@ -124,7 +141,7 @@ export default function ParticleBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-[-2] pointer-events-none opacity-60"
+      className="fixed inset-0 z-0 pointer-events-none opacity-40 dark:opacity-60 transition-opacity duration-700"
     />
   );
 }
