@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ToolGrid from "@/components/ToolGrid";
+import MusicSection from "@/components/MusicSection";
 import BlogSection from "@/components/BlogSection";
 import SocialSection from "@/components/SocialSection";
 import Footer from "@/components/Footer";
@@ -12,6 +13,7 @@ export default function Home() {
       <Hero />
       <div className="w-full relative z-20 bg-white/30 dark:bg-slate-950/50 backdrop-blur-3xl border-t border-white/40 dark:border-slate-800/50 shadow-2xl">
         <ToolGrid />
+        <MusicSection />
         <BlogSection />
         <SocialSection />
         <Footer />

@@ -46,31 +46,74 @@ export const translations = {
     blog: {
       title: "Latest Writing",
       subtitle: "Thoughts, tutorials, and reflections on AI, software engineering, and design.",
-      viewAll: "View all posts",
+      viewAll: "View on WeChat",
       posts: [
         {
           id: 'post-1',
-          title: 'How I Built the AI Document Translator',
-          date: 'May 06, 2026',
-          excerpt: 'A deep dive into the architecture and prompt engineering behind a high-speed, accurate PDF translation tool.',
-          category: 'Engineering',
-          readTime: '5 min read'
+          title: 'HKSIA Ep.14 | AI-Powered Transformation for Secretarial Firms Successfully Held!',
+          date: 'Jun 14, 2026',
+          excerpt: 'A comprehensive recap of the HKSIA specialized lecture on practical AI tools and industry digital upgrades in Futian, Shenzhen.',
+          category: 'Recap',
+          readTime: '4 min read',
+          url: 'https://mp.weixin.qq.com/s/kQ3GYBjsXnouL8DilXJpcQ'
         },
         {
           id: 'post-2',
-          title: 'The Future of Douyin Data Extraction',
-          date: 'April 28, 2026',
-          excerpt: 'Exploring ethical and scalable ways to gather insights from short-video platforms for market analysis.',
-          category: 'Data Science',
-          readTime: '8 min read'
+          title: 'Event Preview | HKSIA Lecture: AI Practical Tools for Secretarial Firms',
+          date: 'May 25, 2026',
+          excerpt: 'Empowering secretarial companies with AI-driven transformation, boosting efficiency, and building cross-border cooperation.',
+          category: 'Event Preview',
+          readTime: '3 min read',
+          url: 'https://mp.weixin.qq.com/s/FVV186ZPk1t2hNUbVF1ziw'
         },
         {
           id: 'post-3',
-          title: 'Designing with Glassmorphism in Tailwind v4',
-          date: 'April 15, 2026',
-          excerpt: 'How to create stunning, lightweight liquid glass effects without sacrificing performance or accessibility.',
-          category: 'Design',
-          readTime: '4 min read'
+          title: 'They Laughed at Your Dream, Now They Ask How You Did It...',
+          date: 'Apr 06, 2025',
+          excerpt: 'Keep going and you WIN. Reflections on grit, perseverance, and the mindset required to turn bold visions into reality.',
+          category: 'Growth & Mindset',
+          readTime: '3 min read',
+          url: 'https://mp.weixin.qq.com/s/sSDzbM0X5_HrWMNMyOkAmA'
+        },
+        {
+          id: 'post-4',
+          title: 'Your AI Action Advisor "JustGanIt Bot" is Officially Live!',
+          date: 'Mar 22, 2025',
+          excerpt: 'Say goodbye to hesitation: Introducing JustGanIt Bot, your proactive AI assistant designed to break procrastination.',
+          category: 'AI Product',
+          readTime: '3 min read',
+          url: 'https://mp.weixin.qq.com/s/UPE42z0LCZW-GbSjbu_xLQ'
+        },
+        {
+          id: 'post-5',
+          title: 'Why Did the 3rd IPP Choose Such an Abstract Theme?',
+          date: 'Mar 20, 2025',
+          excerpt: 'Behind-the-scenes thoughts and creative inspiration exploring the abstract symbolism and theme of the 3rd IPP.',
+          category: 'Insights',
+          readTime: '4 min read',
+          url: 'https://mp.weixin.qq.com/s/KHhlkuvYLhcEn09DoZpncw'
+        }
+      ]
+    },
+    music: {
+      title: "Music & Creative Works",
+      subtitle: "Beyond coding and AI — rhythmic creations and energetic beats for unstoppable dreamers.",
+      trackTitle: "Dare to Shine (干这属于我的精彩)",
+      artist: "BANANA PIES / CHUANG",
+      description: "An energetic anthem crafted for those who dare to chase their dreams and break through limits.",
+      listenOn: "Listen Now",
+      platforms: [
+        {
+          id: 'qq-music',
+          name: 'QQ 音乐 (QQ Music)',
+          url: 'https://c6.y.qq.com/base/fcgi-bin/u?__=g0x92Xn59VU3',
+          color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+        },
+        {
+          id: 'apple-music',
+          name: 'Apple Music',
+          url: 'https://music.apple.com/cn/album/%E5%B9%B2%E8%BF%99%E5%B1%9E%E4%BA%8E%E6%88%91%E7%9A%84%E7%B2%BE%E5%BD%A9/1830182307?i=1830182311&ls',
+          color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
         }
       ]
     },
@@ -151,32 +194,75 @@ export const translations = {
     },
     blog: {
       title: "最新文章",
-      subtitle: "关于人工智能、软件工程与设计的思考、教程与回顾。",
-      viewAll: "查看所有文章",
+      subtitle: "记录关于 AI 实践、行业赋能、产品设计与创业成长的深度思考。",
+      viewAll: "在微信公众号阅读全部",
       posts: [
         {
           id: 'post-1',
-          title: '我是如何构建 AI 沉浸式翻译工具的',
-          date: '2026年5月06日',
-          excerpt: '深入解析这款极速、准确的 PDF 翻译工具背后的架构设计与提示词工程策略。',
-          category: '工程实践',
-          readTime: '5 分钟阅读'
+          title: 'HKSIA第14期 | 香港秘书行业协会【AI赋能秘书公司转型升级】讲座圆满举办！',
+          date: '2026年6月14日',
+          excerpt: '香港秘书行业协会「AI赋能秘书公司转型升级」专题讲座在深圳福田圆满举办，围绕 AI 技术在秘书行业的实战落地展开深度分享。',
+          category: '活动回顾',
+          readTime: '4 分钟阅读',
+          url: 'https://mp.weixin.qq.com/s/kQ3GYBjsXnouL8DilXJpcQ'
         },
         {
           id: 'post-2',
-          title: '抖音数据提取的未来之道',
-          date: '2026年4月28日',
-          excerpt: '探索如何以合规、可扩展的方式从短视频平台获取深度洞察，用于市场分析。',
-          category: '数据科学',
-          readTime: '8 分钟阅读'
+          title: '活动预告 | 香港秘书行业协会【AI赋能秘书公司转型升级:AI+秘书工具实战分享】讲座',
+          date: '2026年5月25日',
+          excerpt: '为紧跟人工智能发展浪潮，助力秘书行业实现数字化转型，特举办 AI 赋能秘书行业实战分享活动。',
+          category: '活动预告',
+          readTime: '3 分钟阅读',
+          url: 'https://mp.weixin.qq.com/s/FVV186ZPk1t2hNUbVF1ziw'
         },
         {
           id: 'post-3',
-          title: '在 Tailwind v4 中设计液态玻璃',
-          date: '2026年4月15日',
-          excerpt: '如何在不牺牲性能或无障碍访问的前提下，创造令人惊艳的轻量级流体玻璃视觉效果。',
-          category: '设计规范',
-          readTime: '4 分钟阅读'
+          title: '他们嘲笑你的梦想，现在却在问你是怎么做到的……',
+          date: '2025年4月06日',
+          excerpt: 'Keep going 就能 WIN（赢），分享在创业与追梦旅途中的思考、韧性与坚持的力量。',
+          category: '成长心路',
+          readTime: '3 分钟阅读',
+          url: 'https://mp.weixin.qq.com/s/sSDzbM0X5_HrWMNMyOkAmA'
+        },
+        {
+          id: 'post-4',
+          title: '你的AI行动顾问“干就完了bot”正式上线！',
+          date: '2025年3月22日',
+          excerpt: '告别踌躇，即刻启程：您的 AI 赋能行动顾问——“干就完了bot”正式亮相，助你击破拖延。',
+          category: 'AI 产品',
+          readTime: '3 分钟阅读',
+          url: 'https://mp.weixin.qq.com/s/UPE42z0LCZW-GbSjbu_xLQ'
+        },
+        {
+          id: 'post-5',
+          title: '为什么第三届IPP取了个这么抽象的主题?',
+          date: '2025年3月20日',
+          excerpt: '深度探讨第三届 IPP 创意主题背后的构思故事、抽象隐喻与灵感来源。',
+          category: '思考随笔',
+          readTime: '4 分钟阅读',
+          url: 'https://mp.weixin.qq.com/s/KHhlkuvYLhcEn09DoZpncw'
+        }
+      ]
+    },
+    music: {
+      title: "音乐与创意作品",
+      subtitle: "在代码与 AI 之外，用热血律动记录灵感与追梦的轨迹。",
+      trackTitle: "干这属于我的精彩",
+      artist: "BANANA PIES / CHUANG",
+      description: "热血节奏，献给每一个敢想敢拼、打破常规的追梦者。即刻在各大音乐流媒体试听。",
+      listenOn: "前往试听",
+      platforms: [
+        {
+          id: 'qq-music',
+          name: 'QQ 音乐',
+          url: 'https://c6.y.qq.com/base/fcgi-bin/u?__=g0x92Xn59VU3',
+          color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+        },
+        {
+          id: 'apple-music',
+          name: 'Apple Music',
+          url: 'https://music.apple.com/cn/album/%E5%B9%B2%E8%BF%99%E5%B1%9E%E4%BA%8E%E6%88%91%E7%9A%84%E7%B2%BE%E5%BD%A9/1830182307?i=1830182311&ls',
+          color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
         }
       ]
     },
