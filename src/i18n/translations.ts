@@ -26,6 +26,14 @@ export const translations = {
           statusKey: 'statusLive',
         },
         {
+          id: 'poker-arena',
+          name: 'LLM Poker Arena',
+          description: 'A multi-agent Texas Hold\'em arena powered by Gemini LLM intelligence, featuring loan mechanics and battle analytics.',
+          url: 'https://poker.justganit.com/',
+          icon: '🃏',
+          statusKey: 'statusLive',
+        },
+        {
           id: 'douyin-scraper',
           name: 'Douyin Data Scraper',
           description: 'Advanced data extraction pipeline for Douyin (TikTok China) analytics and insights.',
@@ -121,6 +129,14 @@ export const translations = {
           description: '基于 MiniMax 大模型驱动的极速、高精度的文档与 PDF 翻译工具。',
           url: 'https://aitranslator.justganit.com/',
           icon: '🌐',
+          statusKey: 'statusLive',
+        },
+        {
+          id: 'poker-arena',
+          name: '德州扑克 AI 博弈场',
+          description: '基于 Gemini 大模型多智能体决策框架的德州扑克博弈游戏，支持借贷机制与战绩追踪。',
+          url: 'https://poker.justganit.com/',
+          icon: '🃏',
           statusKey: 'statusLive',
         },
         {
