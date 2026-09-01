@@ -27,9 +27,9 @@ export default function RootLayout({
             <ParticleBackground />
             {/* Ambient Background Elements */}
             <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-              <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-amber-200/40 dark:bg-amber-600/20 blur-3xl animate-blob" />
-              <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-orange-200/30 dark:bg-orange-600/10 blur-3xl animate-blob animation-delay-2000" />
-              <div className="absolute bottom-[-20%] left-[20%] w-[60%] h-[60%] rounded-full bg-yellow-100/40 dark:bg-yellow-500/10 blur-3xl animate-blob animation-delay-4000" />
+              <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-amber-200/20 dark:bg-amber-600/15 blur-3xl animate-blob" />
+              <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-orange-200/15 dark:bg-orange-600/10 blur-3xl animate-blob animation-delay-2000" />
+              <div className="absolute bottom-[-20%] left-[20%] w-[60%] h-[60%] rounded-full bg-yellow-200/15 dark:bg-yellow-500/10 blur-3xl animate-blob animation-delay-4000" />
             </div>
             {children}
           </LanguageProvider>

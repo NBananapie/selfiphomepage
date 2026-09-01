@@ -63,16 +63,6 @@ export default function Hero() {
           </button>
         </div>
       </div>
-
-      {/* Subtle Scroll Down Prompt */}
-      <div 
-        onClick={() => scrollToSection('tools')}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-pointer text-slate-400 dark:text-slate-500"
-      >
-        <div className="w-5 h-8 rounded-full border-2 border-current flex items-start justify-center p-1">
-          <div className="w-1 h-2 rounded-full bg-current animate-bounce" />
-        </div>
-      </div>
     </section>
   );
 }

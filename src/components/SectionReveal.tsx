@@ -22,14 +22,12 @@ export default function SectionReveal({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
+        // Toggle visibility bidirectionally on scroll up and down
+        setIsVisible(entry.isIntersecting);
       },
       {
-        threshold: 0.12,
-        rootMargin: '0px 0px -50px 0px',
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px',
       }
     );
 
@@ -44,12 +42,12 @@ export default function SectionReveal({
     <div
       ref={domRef}
       style={{
-        transitionDelay: `${delayMs}ms`,
+        transitionDelay: isVisible ? `${delayMs}ms` : '0ms',
       }}
-      className={`transition-all duration-1000 cubic-bezier(0.16, 1, 0.3, 1) transform ${
+      className={`transition-all duration-800 cubic-bezier(0.16, 1, 0.3, 1) transform will-change-transform ${
         isVisible
           ? 'opacity-100 translate-y-0 scale-100 filter-none'
-          : 'opacity-0 translate-y-10 scale-[0.98] blur-[2px]'
+          : 'opacity-0 translate-y-8 scale-[0.98] blur-[2px]'
       } ${className}`}
     >
       {children}
