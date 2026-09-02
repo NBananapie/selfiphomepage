@@ -16,11 +16,8 @@ export default function Footer() {
           <a href="https://github.com/NBananapie" target="_blank" rel="noopener noreferrer" className="hover:text-amber-600 dark:hover:text-amber-500 transition-colors font-medium">
             GitHub
           </a>
-          <a href="#" className="hover:text-amber-600 dark:hover:text-amber-500 transition-colors font-medium">
-            Twitter
-          </a>
-          <a href="#" className="hover:text-amber-600 dark:hover:text-amber-500 transition-colors font-medium">
-            LinkedIn
+          <a href="https://x.com/GanBananaReal" target="_blank" rel="noopener noreferrer" className="hover:text-amber-600 dark:hover:text-amber-500 transition-colors font-medium">
+            X (Twitter)
           </a>
         </div>
       </div>
