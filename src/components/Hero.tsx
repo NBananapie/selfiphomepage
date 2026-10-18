@@ -21,10 +21,6 @@ export default function Hero() {
 
   return (
     <section className="relative w-full pt-36 pb-24 px-4 min-h-[92vh] flex flex-col justify-center items-center overflow-hidden">
-      {/* Soft Ambient Light Cones */}
-      <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-amber-200/20 dark:bg-amber-500/10 rounded-full filter blur-3xl pointer-events-none animate-blob"></div>
-      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-orange-200/15 dark:bg-orange-500/10 rounded-full filter blur-3xl pointer-events-none animate-blob animation-delay-2000"></div>
-
       <div className="z-10 flex flex-col items-center text-center max-w-4xl mx-auto animate-float">
         <div className="mb-8 relative">
           <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-white/80 dark:border-slate-800/80 shadow-2xl relative z-10 bg-slate-100 dark:bg-slate-800">
