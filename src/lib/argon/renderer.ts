@@ -491,50 +491,37 @@ export class ArgonRenderer {
 
           glowTarget = q.charge * (0.4 + 0.6 * capture);
         } else {
-          // 2. ALL OTHER PARTICLES ACROSS SCREEN: Global radial attraction decaying outward from center of "干"
-          // Force magnitude gradually decays from motif center outwards ("由这个干中心向外逐渐由强减弱 递减")
-          const dx = this.anchorX - q.x;
-          const dy = this.anchorY - q.y;
+          // 2. UNRECRUITED AMBIENT PARTICLES: Calmly floating in the surrounding space without swirling/circling
+          // 彻底取消外围圆环旋转与强心引力，剩余粒子缓慢悠闲地漂浮在四周
+          const drag = Math.pow(0.965, f);
+          q.vx = q.vx * drag + ambVx * 0.45 * f;
+          q.vy = q.vy * drag + ambVy * 0.45 * f;
+
+          // 仅在接近"干"字内部粉床与笔画区时给予极轻柔的外推，防止杂质侵入文字中心镂空
+          const dx = q.x - this.anchorX;
+          const dy = q.y - this.anchorY;
           const r = Math.hypot(dx, dy) + 1e-3;
-
-          const rHalf = box * 1.35;
-          const globalPull = (1.25 * dpr / (1 + Math.pow(r / rHalf, 1.35))) * (0.7 + 0.5 * q.depth);
-
-          const rInner = box * 0.52;
-          const rOuter = box * 0.82;
-          const tInward = smoothstep(rInner, rOuter, r);
-          const fIn = globalPull * tInward;
-
-          // Tangential swirl and outer cushion near the stencil halo
-          const nearHalo = 1 - smoothstep(rInner, box * 1.4, r);
-          const fSwirl = 0.32 * dpr * nearHalo * q.swirlDir;
-
-          let fRepel = 0;
-          if (r < rInner) {
-            fRepel = -0.45 * dpr * (1 - r / rInner);
+          const avoidR = box * 0.55;
+          if (r < avoidR) {
+            const push = 0.28 * dpr * (1 - r / avoidR) * f;
+            q.vx += (dx / r) * push;
+            q.vy += (dy / r) * push;
           }
 
-          const ax = (dx / r) * (fIn + fRepel) + (-dy / r) * fSwirl + ambVx * 0.15;
-          const ay = (dy / r) * (fIn + fRepel) + (dx / r) * fSwirl + ambVy * 0.15;
-
-          const drag = Math.pow(0.955, f);
-          q.vx = q.vx * drag + ax * f;
-          q.vy = q.vy * drag + ay * f;
-
           const speed = Math.hypot(q.vx, q.vy);
-          const maxOuterSpeed = maxSpeed * 0.72;
-          if (speed > maxOuterSpeed) {
-            const s = maxOuterSpeed / speed;
+          const maxCalmSpeed = maxSpeed * 0.25;
+          if (speed > maxCalmSpeed) {
+            const s = maxCalmSpeed / speed;
             q.vx *= s;
             q.vy *= s;
           }
 
-          // Gentle ambient cosmic aura glow as they stream inwards
-          glowTarget = Math.max(0, 0.42 * (1 - r / (box * 2.2)));
+          // 外围粒子保持自然暗调环境微光，不产生发光圆环
+          glowTarget = 0;
         }
       } else {
         // === IDLE / HOVER STATE ===
-        // Normal ambient drift + Subtle hover attraction & orbital swirl around mouse cursor
+        // Normal ambient drift + 3D volumetric spherical rolling / drifting within a circular domain
         let ax = 0;
         let ay = 0;
 
@@ -544,19 +531,41 @@ export class ArgonRenderer {
           const r = Math.hypot(dx, dy) + 1e-3;
 
           if (r < hoverRadius) {
-            const s = 1 - r / hoverRadius;
-            // Soft inward attraction (not too strong) with inner cushion so it doesn't over-collapse
-            const coreLimit = 38 * dpr;
-            const fIn = r > coreLimit
-              ? 0.08 * dpr * s * s * hoverAmount
-              : -0.05 * dpr * (1 - r / coreLimit) * hoverAmount;
-            // Subtle celestial orbital rotation
-            const fSwirl = 0.06 * dpr * s * q.swirlDir * hoverAmount;
+            const normR = r / hoverRadius;
+            const s = 1 - normR;
 
-            ax = (dx / r) * fIn + (-dy / r) * fSwirl;
-            ay = (dy / r) * fIn + (dx / r) * fSwirl;
+            // 1. 模拟三维立体球面内的往复滚动与漫游（3D volumetric oscillation & rolling）
+            // 彻底去除固定圆周单向绕圈(fSwirl)，而是沿空间曲面经纬方向来回翻滚穿梭
+            const rollPhase = tSlow * 1.5 + q.phase * 2.8;
+            // 粒子深度分为前后两层，前后层产生对流交错往复运动，视觉上呈现球体来回滚动
+            const zSign = q.depth > 0.5 ? 1.0 : -1.0;
 
-            glowTarget = Math.max(glowTarget, 0.22 * s * s * hoverAmount);
+            // 往复切向翻滚速度（正弦波正负振荡，顺时针滚动后逆时针滚回）
+            const rollTangential = Math.sin(rollPhase) * zSign * 0.18 * dpr * hoverAmount;
+            // 往复径向穿梭（在圆心与边缘之间来回游动浮动）
+            const rollRadial = Math.cos(rollPhase * 0.8 + q.phase) * 0.14 * dpr * hoverAmount;
+
+            // 2. 空间圆/球面范围软边界约束（Soft boundary keeping particles rolling within the sphere）
+            let fBoundary = 0;
+            if (normR > 0.65) {
+              // 靠近外圈边缘时柔和弹性回弹向心，约束粒子在圆范围内滚动，不飞散
+              fBoundary = 0.12 * dpr * Math.pow((normR - 0.65) / 0.35, 1.4) * hoverAmount;
+            } else if (r < 28 * dpr) {
+              // 靠近中心时微弱排斥缓冲，避免粒子过度聚集成死核
+              fBoundary = -0.06 * dpr * (1 - r / (28 * dpr)) * hoverAmount;
+            }
+
+            // 3. 轻微的整体聚集倾向（"变得密集一点点 但不要太密集"）
+            const fGentleGather = 0.035 * dpr * s * hoverAmount;
+
+            const radialForce = fBoundary + fGentleGather + rollRadial;
+            const tangentialForce = rollTangential;
+
+            ax = (dx / r) * radialForce + (-dy / r) * tangentialForce;
+            ay = (dy / r) * radialForce + (dx / r) * tangentialForce;
+
+            // 伴随微弱的粉末光泽
+            glowTarget = Math.max(glowTarget, 0.16 * s * hoverAmount);
           }
         }
 
