@@ -102,6 +102,8 @@ export default function ArgonBackground() {
     let targetPointer: [number, number] = [0, 0];
     let isPointerDown = false;
     let holdTargetUV: [number, number] = [0.5, 0.5];
+    let targetHoverUV: [number, number] = [0.5, 0.5];
+    let isHovering = false;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -122,9 +124,15 @@ export default function ArgonBackground() {
       const nx = e.clientX / w;
       const ny = e.clientY / h;
       targetPointer = [(nx - 0.5) * 2, (ny - 0.5) * 2];
+      targetHoverUV = [nx, ny];
+      isHovering = true;
       if (isPointerDown) {
         holdTargetUV = [nx, ny];
       }
+    };
+
+    const handlePointerLeave = () => {
+      isHovering = false;
     };
 
     const handlePointerDown = (e: PointerEvent) => {
@@ -175,6 +183,7 @@ export default function ArgonBackground() {
     canvas.addEventListener('webglcontextrestored', handleContextRestored);
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerleave', handlePointerLeave, { passive: true });
     window.addEventListener('pointerdown', handlePointerDown, { passive: true });
     window.addEventListener('pointerup', stopHold, { passive: true });
     window.addEventListener('pointercancel', stopHold, { passive: true });
@@ -192,6 +201,11 @@ export default function ArgonBackground() {
 
         interaction.pointer[0] += (targetPointer[0] - interaction.pointer[0]) * 0.06;
         interaction.pointer[1] += (targetPointer[1] - interaction.pointer[1]) * 0.06;
+
+        interaction.hover[0] += (targetHoverUV[0] - interaction.hover[0]) * 0.12;
+        interaction.hover[1] += (targetHoverUV[1] - interaction.hover[1]) * 0.12;
+        const targetHoverAmount = isHovering ? 1.0 : 0.0;
+        interaction.hoverAmount += (targetHoverAmount - interaction.hoverAmount) * 0.08;
 
         if (isPointerDown) {
           interaction.holdPoint[0] += (holdTargetUV[0] - interaction.holdPoint[0]) * 0.09;
@@ -216,6 +230,7 @@ export default function ArgonBackground() {
       window.removeEventListener('resize', resize);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerleave', handlePointerLeave);
       window.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointerup', stopHold);
       window.removeEventListener('pointercancel', stopHold);

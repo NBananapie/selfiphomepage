@@ -6,7 +6,7 @@ const INF = 1e12;
 export const GLYPH_SPAN_RATIO = 320 / 512;
 
 // Powder distribution parameters, in SDF texture pixels.
-const TARGET_POOL = 10000;
+const TARGET_POOL = 11500;
 const GLYPH_EDGE_MARGIN = 0.8; // Negative space: points with d < 0.8px are inside ink and excluded
 
 function edt1d(f: Float64Array, d: Float64Array, v: Int32Array, z: Float64Array, n: number) {

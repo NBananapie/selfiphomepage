@@ -28,6 +28,7 @@ interface PowderParticle {
   grainSize: number; // diameter while resting in the pile, CSS px
   sharpness: number;
   phase: number;
+  swirlDir: number; // +1 or -1 for gentle orbital rotation
   target: number; // index into the glyph target list, -1 when not recruited
   charge: number; // 0..1, how strongly the field currently holds this grain
   glow: number; // 0..1, smoothed visual state (floating dust -> resting grain)
@@ -146,6 +147,7 @@ export class ArgonRenderer {
         grainSize: 1.6 + Math.random() * 2.0,
         sharpness: 0.45 + Math.random() * 0.45,
         phase: Math.random() * Math.PI * 2,
+        swirlDir: (i % 2 === 0 ? 1 : -1) * (0.8 + Math.random() * 0.4),
         target: -1,
         charge: 0,
         glow: 0,
@@ -430,6 +432,12 @@ export class ArgonRenderer {
     let back = NUM_PARTICLES; // floating dust is packed from the back
     let anyGlow = false;
 
+    const hoverX = interaction.hover[0] * w;
+    const hoverY = interaction.hover[1] * h;
+    const hoverAmount = interaction.hoverAmount;
+    const isHoverActive = !this.gathering && hoverAmount > 0.02;
+    const hoverRadius = 220 * dpr;
+
     for (let i = 0; i < this.particles.length; i++) {
       const q = this.particles[i];
 
@@ -444,49 +452,116 @@ export class ArgonRenderer {
 
       let glowTarget = 0;
 
-      if (q.target >= 0 && q.target < targetCount && targets) {
-        // SIMULTANEOUS RECRUITMENT: All grains in the negative space field activate together!
-        q.charge = Math.min(1, q.charge + 0.08 * f);
+      if (this.gathering) {
+        // === GATHERING / SUMMON STATE ===
+        if (q.target >= 0 && q.target < targetCount && targets) {
+          // 1. RECRUITED STENCIL PARTICLES: Attracted to precise negative-space target slots
+          q.charge = Math.min(1, q.charge + 0.08 * f);
 
-        const tx = this.anchorX + targets[q.target * 2] * box;
-        const ty = this.anchorY + targets[q.target * 2 + 1] * box;
-        const dx = tx - q.x;
-        const dy = ty - q.y;
-        const r = Math.hypot(dx, dy) + 1e-3;
-        const capture = Math.max(0, Math.min(1, 1 - r / captureR));
+          const tx = this.anchorX + targets[q.target * 2] * box;
+          const ty = this.anchorY + targets[q.target * 2 + 1] * box;
+          const dx = tx - q.x;
+          const dy = ty - q.y;
+          const r = Math.hypot(dx, dy) + 1e-3;
+          const capture = Math.max(0, Math.min(1, 1 - r / captureR));
 
-        // Simultaneous suction with depth variation:
-        // Near grains (depth=1) move faster and brighter; far grains stream in gently
-        const flight = 1 - capture;
-        const pull = (1.8 * dpr + Math.min(7.0 * dpr, r * 0.016)) * flight * (0.75 + 0.5 * q.depth);
-        let ax = q.charge * ((dx / r) * pull + dx * SPRING_K * capture);
-        let ay = q.charge * ((dy / r) * pull + dy * SPRING_K * capture);
+          const flight = 1 - capture;
+          const pull = (1.8 * dpr + Math.min(7.0 * dpr, r * 0.016)) * flight * (0.75 + 0.5 * q.depth);
+          let ax = q.charge * ((dx / r) * pull + dx * SPRING_K * capture);
+          let ay = q.charge * ((dy / r) * pull + dy * SPRING_K * capture);
 
-        // Air turbulence only disturbs grains still in flight
-        ax += ambVx * 0.2 * flight;
-        ay += ambVy * 0.2 * flight;
+          ax += ambVx * 0.2 * flight;
+          ay += ambVy * 0.2 * flight;
 
-        const drag = Math.pow(1 - (AIR_DRAG + PILE_FRICTION * capture * q.charge), f);
-        q.vx = q.vx * drag + ax * f;
-        q.vy = q.vy * drag + ay * f;
+          const drag = Math.pow(1 - (AIR_DRAG + PILE_FRICTION * capture * q.charge), f);
+          q.vx = q.vx * drag + ax * f;
+          q.vy = q.vy * drag + ay * f;
 
-        const speed = Math.hypot(q.vx, q.vy);
-        if (speed > maxSpeed) {
-          const s = maxSpeed / speed;
-          q.vx *= s;
-          q.vy *= s;
+          const speed = Math.hypot(q.vx, q.vy);
+          if (speed > maxSpeed) {
+            const s = maxSpeed / speed;
+            q.vx *= s;
+            q.vy *= s;
+          }
+
+          if (capture > 0.8) {
+            q.vx += (Math.random() - 0.5) * 0.12 * dpr;
+            q.vy += (Math.random() - 0.5) * 0.12 * dpr;
+          }
+
+          glowTarget = q.charge * (0.4 + 0.6 * capture);
+        } else {
+          // 2. ALL OTHER PARTICLES ACROSS SCREEN: Global radial attraction decaying outward from center of "干"
+          // Force magnitude gradually decays from motif center outwards ("由这个干中心向外逐渐由强减弱 递减")
+          const dx = this.anchorX - q.x;
+          const dy = this.anchorY - q.y;
+          const r = Math.hypot(dx, dy) + 1e-3;
+
+          const rHalf = box * 1.35;
+          const globalPull = (1.25 * dpr / (1 + Math.pow(r / rHalf, 1.35))) * (0.7 + 0.5 * q.depth);
+
+          const rInner = box * 0.52;
+          const rOuter = box * 0.82;
+          const tInward = smoothstep(rInner, rOuter, r);
+          const fIn = globalPull * tInward;
+
+          // Tangential swirl and outer cushion near the stencil halo
+          const nearHalo = 1 - smoothstep(rInner, box * 1.4, r);
+          const fSwirl = 0.32 * dpr * nearHalo * q.swirlDir;
+
+          let fRepel = 0;
+          if (r < rInner) {
+            fRepel = -0.45 * dpr * (1 - r / rInner);
+          }
+
+          const ax = (dx / r) * (fIn + fRepel) + (-dy / r) * fSwirl + ambVx * 0.15;
+          const ay = (dy / r) * (fIn + fRepel) + (dx / r) * fSwirl + ambVy * 0.15;
+
+          const drag = Math.pow(0.955, f);
+          q.vx = q.vx * drag + ax * f;
+          q.vy = q.vy * drag + ay * f;
+
+          const speed = Math.hypot(q.vx, q.vy);
+          const maxOuterSpeed = maxSpeed * 0.72;
+          if (speed > maxOuterSpeed) {
+            const s = maxOuterSpeed / speed;
+            q.vx *= s;
+            q.vy *= s;
+          }
+
+          // Gentle ambient cosmic aura glow as they stream inwards
+          glowTarget = Math.max(0, 0.42 * (1 - r / (box * 2.2)));
         }
-
-        // Settling micro-jitter in the resting powder pile
-        if (capture > 0.8) {
-          q.vx += (Math.random() - 0.5) * 0.12 * dpr;
-          q.vy += (Math.random() - 0.5) * 0.12 * dpr;
-        }
-
-        glowTarget = q.charge * (0.4 + 0.6 * capture);
       } else {
-        q.vx += (ambVx - q.vx) * ambientRelax;
-        q.vy += (ambVy - q.vy) * ambientRelax;
+        // === IDLE / HOVER STATE ===
+        // Normal ambient drift + Subtle hover attraction & orbital swirl around mouse cursor
+        let ax = 0;
+        let ay = 0;
+
+        if (isHoverActive) {
+          const dx = hoverX - q.x;
+          const dy = hoverY - q.y;
+          const r = Math.hypot(dx, dy) + 1e-3;
+
+          if (r < hoverRadius) {
+            const s = 1 - r / hoverRadius;
+            // Soft inward attraction (not too strong) with inner cushion so it doesn't over-collapse
+            const coreLimit = 38 * dpr;
+            const fIn = r > coreLimit
+              ? 0.08 * dpr * s * s * hoverAmount
+              : -0.05 * dpr * (1 - r / coreLimit) * hoverAmount;
+            // Subtle celestial orbital rotation
+            const fSwirl = 0.06 * dpr * s * q.swirlDir * hoverAmount;
+
+            ax = (dx / r) * fIn + (-dy / r) * fSwirl;
+            ay = (dy / r) * fIn + (dx / r) * fSwirl;
+
+            glowTarget = Math.max(glowTarget, 0.22 * s * s * hoverAmount);
+          }
+        }
+
+        q.vx = (q.vx + ax * f) * Math.pow(0.965, f) + (ambVx - q.vx) * ambientRelax;
+        q.vy = (q.vy + ay * f) * Math.pow(0.965, f) + (ambVy - q.vy) * ambientRelax;
         // Freshly released clumps settle slightly downward before thinning out
         q.vy += 0.02 * dpr * q.glow * f;
       }
@@ -495,8 +570,8 @@ export class ArgonRenderer {
       q.y += q.vy * f;
 
       // Real-time SDF exclusion guard:
-      // If a grain penetrates the strokes of the glyph (negative stencil), push it outward immediately!
-      if (entry && entry.ready && q.charge > 0.1) {
+      // If ANY grain penetrates the strokes of the glyph (negative stencil), push it outward immediately!
+      if (entry && entry.ready && this.gathering) {
         const u = (q.x - this.anchorX) / box + 0.5;
         const v = (q.y - this.anchorY) / box + 0.5;
         if (u > 0.01 && u < 0.99 && v > 0.01 && v < 0.99) {
