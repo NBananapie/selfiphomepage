@@ -154,6 +154,15 @@ export const translations: Record<Language, TranslationSchema> = {
       readArticle: "Read Article",
       posts: [
         {
+          id: 'post-antigravity',
+          title: 'After Being Disgusted by Codex, Is Antigravity the Ultimate Meta Answer?',
+          date: 'Nov 01, 2026',
+          excerpt: 'An in-depth analysis of Codex quota changes vs Google Antigravity architecture, multi-model ecosystem, and 7x value proposition as the ultimate coding assistant.',
+          category: 'Deep Dive',
+          readTime: '5 min read',
+          url: 'https://mp.weixin.qq.com/s/qT0VjSlxIyn0uTNTrx7H8Q'
+        },
+        {
           id: 'post-1',
           title: 'HKSIA Ep.14 | AI-Powered Transformation for Secretarial Firms Successfully Held!',
           date: 'Jun 14, 2026',
@@ -331,6 +340,15 @@ export const translations: Record<Language, TranslationSchema> = {
       viewAll: "在微信公众号阅读全部",
       readArticle: "阅读文章",
       posts: [
+        {
+          id: 'post-antigravity',
+          title: '被Codex恶心后，Antigravity真的是版本答案了？',
+          date: '2026年11月01日',
+          excerpt: '深入剖析 Codex 用量限制与骚操作，全面评测 Google Antigravity 架构特点、多模型调用生态与超高性价比，探讨当前 AI 编程辅助工具的“版本答案”。',
+          category: '深度评测',
+          readTime: '5 分钟阅读',
+          url: 'https://mp.weixin.qq.com/s/qT0VjSlxIyn0uTNTrx7H8Q'
+        },
         {
           id: 'post-1',
           title: 'HKSIA第14期 | 香港秘书行业协会【AI赋能秘书公司转型升级】讲座圆满举办！',

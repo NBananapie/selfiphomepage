@@ -37,11 +37,11 @@ const NUM_PARTICLES = 16000;
 const FLOATS_PER_PARTICLE = 6; // x, y, size, alpha, sharpness, glow
 
 // Formation tuning (CSS px based, scaled by device pixel ratio at runtime)
-const CAPTURE_RADIUS = 30; // inside this distance the grain is caught by the pile (spring + friction)
-const SPRING_K = 0.08;
+const CAPTURE_RADIUS = 20; // inside this distance the grain is caught by the pile (spring + friction)
+const SPRING_K = 0.09;
 const AIR_DRAG = 0.045; // per-frame velocity loss in flight
 const PILE_FRICTION = 0.38; // extra per-frame velocity loss once caught
-const MAX_SPEED = 22;
+const MAX_SPEED = 18;
 
 function smoothstep(e0: number, e1: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
@@ -142,8 +142,8 @@ export class ArgonRenderer {
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3,
         depth,
-        dustSize: 1.5 + depth * 2.2,
-        grainSize: 2.2 + Math.random() * 2.6,
+        dustSize: 1.2 + depth * 1.8,
+        grainSize: 1.6 + Math.random() * 2.0,
         sharpness: 0.45 + Math.random() * 0.45,
         phase: Math.random() * Math.PI * 2,
         target: -1,
@@ -233,7 +233,8 @@ export class ArgonRenderer {
   private glyphBoxPx() {
     const dpr = this.pixelRatio();
     const cssMin = Math.min(this.canvas.width, this.canvas.height) / dpr;
-    const glyphCss = Math.max(140, Math.min(260, cssMin * 0.35));
+    // Scaled to a compact, refined badge size (around 80px on mobile, 135px on desktop)
+    const glyphCss = Math.max(80, Math.min(140, cssMin * 0.17));
     return (glyphCss / GLYPH_SPAN_RATIO) * dpr;
   }
 
@@ -558,7 +559,7 @@ export class ArgonRenderer {
 
     gl.uniform2f(this.particleUniforms.resolution, w, h);
     gl.uniform1f(this.particleUniforms.darkMode, isDark ? 1 : 0);
-    gl.uniform2f(this.particleUniforms.shadowOffset, 1.6 * dpr, 2.4 * dpr);
+    gl.uniform2f(this.particleUniforms.shadowOffset, 1.2 * dpr, 1.8 * dpr);
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
