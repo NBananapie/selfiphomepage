@@ -8,15 +8,18 @@ import { Moon, Sun } from 'lucide-react';
 
 export default function Header() {
   const { language, setLanguage } = useLanguage();
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const isDark = (resolvedTheme || theme) === 'dark';
 
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 30);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -30,7 +33,7 @@ export default function Header() {
   };
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme(isDark ? 'light' : 'dark');
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -51,24 +54,26 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 w-full z-50 px-4 py-3 sm:py-4 pointer-events-none transition-all duration-500">
-      <div 
+      <div
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className={`mx-auto flex justify-between items-center liquid-glass nav-spotlight rounded-full px-5 sm:px-6 pointer-events-auto transition-all duration-500 ${
-          isScrolled 
-            ? 'max-w-4xl py-2 shadow-xl bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl' 
+          isScrolled
+            ? 'max-w-4xl py-2 shadow-xl bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl'
             : 'max-w-6xl py-3 shadow-sm bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl'
         }`}
       >
-        <div 
-          className="flex items-center space-x-3 cursor-pointer group"
+        <button
+          type="button"
           onClick={scrollToTop}
+          aria-label="Scroll to top"
+          className="flex items-center space-x-3 cursor-pointer group focus:outline-none"
         >
           <div className="relative w-10 h-10 overflow-hidden rounded-full border-2 border-white/50 dark:border-slate-700 shadow-md group-hover:scale-105 transition-transform">
-            <Image 
-              src="/logo-fist.jpg" 
-              alt="JustGanIt Logo" 
+            <Image
+              src="/logo-fist.jpg"
+              alt="JustGanIt Logo"
               fill
               className="object-cover"
               sizes="40px"
@@ -78,25 +83,28 @@ export default function Header() {
           <span className="font-bold text-lg tracking-tight text-slate-800 dark:text-slate-200">
             JustGanIt
           </span>
-        </div>
+        </button>
 
         {/* Actions */}
         <div className="flex items-center space-x-4">
           {/* Theme Toggle */}
           {mounted && (
             <button
+              type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 transition-colors"
-              aria-label="Toggle Dark Mode"
+              className="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
           )}
 
           {/* Language Toggle */}
-          <button 
+          <button
+            type="button"
             onClick={toggleLanguage}
-            className="px-3 py-1.5 text-sm font-semibold rounded-full bg-slate-800 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-700 dark:hover:bg-slate-200 transition-colors"
+            aria-label={language === 'en' ? 'Switch language to Chinese' : 'Switch language to English'}
+            className="px-3 py-1.5 text-sm font-semibold rounded-full bg-slate-800 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-700 dark:hover:bg-slate-200 transition-colors cursor-pointer"
           >
             {language === 'en' ? '中文' : 'EN'}
           </button>

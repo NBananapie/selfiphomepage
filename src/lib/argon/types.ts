@@ -54,13 +54,20 @@ export interface InteractionState {
   hoverAmount: number;
   tap: [number, number];
   tapAge: number;
+  /** Glyph anchor in normalized viewport coordinates (0..1, y down). */
+  holdPoint: [number, number];
 }
 
 export interface SdfEntry {
   key: string;
   ready: boolean;
-  rgbaBytes: Uint8Array;
-  contourPoints: [number, number, number][];
+  size: number;
+  /** Signed distance in texture pixels (negative inside the glyph). */
+  distField: Float32Array;
+  /** Powder resting positions as (x, y) pairs, relative to the glyph box center in box units (-0.5..0.5). */
+  targets: Float32Array;
+  /** Fraction of the glyph box area covered by ink. */
+  inkFraction: number;
 }
 
 export interface GlyphAtlasEntry {

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { translations, Language } from '../i18n/translations';
+import { translations, Language, TranslationSchema } from '../i18n/translations';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: typeof translations['en'];
+  t: TranslationSchema;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -15,20 +15,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('zh');
 
   useEffect(() => {
-    // Check local storage for saved language
-    const saved = localStorage.getItem('app-language') as Language;
-    if (saved && (saved === 'en' || saved === 'zh')) {
-      setLanguageState(saved);
-    } else {
-      // Default to user browser preference if available
-      const browserLang = navigator.language.startsWith('zh') ? 'zh' : 'en';
-      setLanguageState(browserLang);
-    }
+    const saved = localStorage.getItem('app-language') as Language | null;
+    const initialLang: Language =
+      saved === 'en' || saved === 'zh'
+        ? saved
+        : navigator.language.toLowerCase().startsWith('zh')
+        ? 'zh'
+        : 'en';
+    setLanguageState(initialLang);
+    document.documentElement.lang = initialLang === 'zh' ? 'zh-CN' : 'en';
   }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('app-language', lang);
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   };
 
   const t = translations[language];

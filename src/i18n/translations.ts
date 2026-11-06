@@ -1,4 +1,108 @@
-export const translations = {
+export type Language = 'en' | 'zh';
+export type ToolStatusKey = 'statusLive' | 'statusSoon';
+
+export interface ToolItem {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  icon: string;
+  statusKey: ToolStatusKey;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  category: string;
+  readTime: string;
+  url: string;
+}
+
+export interface MusicPlatform {
+  id: 'qq-music' | 'apple-music';
+  name: string;
+  url: string;
+  color: string;
+}
+
+interface BaseSocialPlatform {
+  id: 'wechat' | 'xiaohongshu' | 'github' | 'x';
+  name: string;
+  handle: string;
+  description: string;
+  color: string;
+  badgeColor: string;
+}
+
+export interface QrSocialPlatform extends BaseSocialPlatform {
+  type: 'qr';
+  qrImage: string;
+}
+
+export interface LinkSocialPlatform extends BaseSocialPlatform {
+  type: 'link';
+  url: string;
+}
+
+export type SocialPlatform = QrSocialPlatform | LinkSocialPlatform;
+
+export interface TranslationSchema {
+  hero: {
+    greeting: string;
+    name: string;
+    subtitle: string;
+    explore: string;
+    blog: string;
+  };
+  tools: {
+    title: string;
+    subtitle: string;
+    launch: string;
+    learnMore: string;
+    statusLive: string;
+    statusSoon: string;
+    comingSoon: string;
+    workingOn: string;
+    items: ToolItem[];
+  };
+  blog: {
+    title: string;
+    subtitle: string;
+    viewAll: string;
+    readArticle: string;
+    posts: BlogPost[];
+  };
+  music: {
+    badge: string;
+    trackType: string;
+    title: string;
+    subtitle: string;
+    trackTitle: string;
+    artist: string;
+    description: string;
+    listenOn: string;
+    platforms: MusicPlatform[];
+  };
+  social: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    qrBadge: string;
+    linkBadge: string;
+    viewQr: string;
+    visitProfile: string;
+    scanPrompt: string;
+    close: string;
+    platforms: SocialPlatform[];
+  };
+  footer: {
+    rights: string;
+  };
+}
+
+export const translations: Record<Language, TranslationSchema> = {
   en: {
     hero: {
       greeting: "Hi, I'm",
@@ -11,7 +115,7 @@ export const translations = {
       title: "AI Toolkit",
       subtitle: "Explore the suite of tools and applications I've built to solve real-world problems.",
       launch: "Launch Tool",
-      learnMore: "Learn More",
+      learnMore: "In Development",
       statusLive: "Live",
       statusSoon: "Coming Soon",
       comingSoon: "More coming soon",
@@ -47,6 +151,7 @@ export const translations = {
       title: "Latest Writing",
       subtitle: "Thoughts, tutorials, and reflections on AI, software engineering, and design.",
       viewAll: "View on WeChat",
+      readArticle: "Read Article",
       posts: [
         {
           id: 'post-1',
@@ -96,6 +201,8 @@ export const translations = {
       ]
     },
     music: {
+      badge: "Creative Release",
+      trackType: "Single Track",
       title: "Music & Creative Works",
       subtitle: "Beyond coding and AI — rhythmic creations and energetic beats for unstoppable dreamers.",
       trackTitle: "Dare to Shine (干这属于我的精彩)",
@@ -118,9 +225,13 @@ export const translations = {
       ]
     },
     social: {
+      badge: "Multi-Channel Matrix",
       title: "Social Matrix",
       subtitle: "Connect with me across platforms and follow my latest builds, thoughts, and updates.",
+      qrBadge: "QR Code",
+      linkBadge: "Link",
       viewQr: "View QR Code",
+      visitProfile: "Visit Profile",
       scanPrompt: "Scan with App to follow",
       close: "Close",
       platforms: [
@@ -182,7 +293,7 @@ export const translations = {
       title: "AI 工具箱",
       subtitle: "探索我为了解决实际问题而打造的一系列工具与应用。",
       launch: "立即体验",
-      learnMore: "了解更多",
+      learnMore: "敬请期待",
       statusLive: "已上线",
       statusSoon: "即将推出",
       comingSoon: "更多惊喜，敬请期待",
@@ -218,6 +329,7 @@ export const translations = {
       title: "最新文章",
       subtitle: "记录关于 AI 实践、行业赋能、产品设计与创业成长的深度思考。",
       viewAll: "在微信公众号阅读全部",
+      readArticle: "阅读文章",
       posts: [
         {
           id: 'post-1',
@@ -267,6 +379,8 @@ export const translations = {
       ]
     },
     music: {
+      badge: "原创音乐特辑",
+      trackType: "个人单曲",
       title: "音乐与创意作品",
       subtitle: "在代码与 AI 之外，用热血律动记录灵感与追梦的轨迹。",
       trackTitle: "干这属于我的精彩",
@@ -289,9 +403,13 @@ export const translations = {
       ]
     },
     social: {
+      badge: "全网社交矩阵",
       title: "社交矩阵",
       subtitle: "跨平台连接与关注我的最新开发成果、技术思考与日常动态。",
+      qrBadge: "二维码",
+      linkBadge: "外链",
       viewQr: "查看二维码",
+      visitProfile: "前往主页",
       scanPrompt: "使用 App 扫码快速关注",
       close: "关闭",
       platforms: [
@@ -343,5 +461,4 @@ export const translations = {
   }
 };
 
-export type Language = 'en' | 'zh';
-export type TranslationKey = keyof typeof translations['en'];
+export type TranslationKey = keyof TranslationSchema;

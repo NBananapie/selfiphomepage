@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 
 export default function BlogSection() {
   const { t } = useLanguage();
+  const primaryPostUrl = t.blog.posts[0]?.url || '#';
 
   return (
     <section id="blog" className="w-full py-24 sm:py-32 px-4 max-w-6xl mx-auto">
@@ -20,9 +21,9 @@ export default function BlogSection() {
               {t.blog.subtitle}
             </p>
           </div>
-          <a 
-            href={(t.blog.posts[0] as any)?.url || '#'} 
-            target="_blank" 
+          <a
+            href={primaryPostUrl}
+            target="_blank"
             rel="noopener noreferrer"
             className="hidden md:inline-flex items-center text-amber-600 dark:text-amber-500 font-bold hover:text-amber-700 dark:hover:text-amber-400 transition-colors cursor-pointer text-sm"
           >
@@ -38,12 +39,15 @@ export default function BlogSection() {
         {t.blog.posts.map((post, index) => (
           <SectionReveal key={post.id} delayMs={index * 100}>
             <a
-              href={(post as any).url || '#'}
-              target={(post as any).url ? '_blank' : '_self'}
+              href={post.url}
+              target="_blank"
               rel="noopener noreferrer"
               className="group block h-full cursor-pointer"
             >
-              <GlassCard hoverable className="h-full flex flex-col bg-white/50 dark:bg-slate-900/40 border border-white/80 dark:border-slate-800/80 group-hover:border-amber-500/50 transition-all duration-300">
+              <GlassCard
+                hoverable
+                className="h-full flex flex-col bg-white/50 dark:bg-slate-900/40 border border-white/80 dark:border-slate-800/80 group-hover:border-amber-500/50 transition-all duration-300"
+              >
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500">
                     {post.category}
@@ -61,7 +65,7 @@ export default function BlogSection() {
                 <div className="text-xs text-slate-500 font-medium pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
                   <span>{post.date}</span>
                   <span className="text-amber-600 dark:text-amber-500 font-bold group-hover:translate-x-1.5 transition-transform inline-flex items-center">
-                    阅读文章 &rarr;
+                    {t.blog.readArticle} &rarr;
                   </span>
                 </div>
               </GlassCard>
@@ -69,11 +73,11 @@ export default function BlogSection() {
           </SectionReveal>
         ))}
       </div>
-      
+
       <div className="mt-10 text-center md:hidden">
-        <a 
-          href={(t.blog.posts[0] as any)?.url || '#'} 
-          target="_blank" 
+        <a
+          href={primaryPostUrl}
+          target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center text-amber-600 dark:text-amber-500 font-bold hover:text-amber-700 dark:hover:text-amber-400 transition-colors text-sm"
         >

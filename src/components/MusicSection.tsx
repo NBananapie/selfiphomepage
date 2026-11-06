@@ -9,9 +9,7 @@ import { SiApplemusic } from 'react-icons/si';
 
 export default function MusicSection() {
   const { t } = useLanguage();
-  const music = (t as any).music;
-
-  if (!music) return null;
+  const { music } = t;
 
   return (
     <section id="music" className="w-full py-24 sm:py-32 px-4 max-w-6xl mx-auto">
@@ -19,7 +17,7 @@ export default function MusicSection() {
         <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold tracking-wider uppercase mb-4 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Creative Release</span>
+            <span>{music.badge}</span>
           </div>
           <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-4">
             {music.title}
@@ -32,7 +30,10 @@ export default function MusicSection() {
 
       <div className="max-w-4xl mx-auto">
         <SectionReveal delayMs={150}>
-          <GlassCard hoverable className="p-8 sm:p-12 relative overflow-hidden bg-white/60 dark:bg-slate-900/50 border border-white/90 dark:border-slate-800/80 shadow-xl">
+          <GlassCard
+            hoverable
+            className="p-8 sm:p-12 relative overflow-hidden bg-white/60 dark:bg-slate-900/50 border border-white/90 dark:border-slate-800/80 shadow-xl"
+          >
             {/* Soft Ambient glow in corner */}
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-300/20 dark:bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-orange-300/15 dark:bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -61,7 +62,7 @@ export default function MusicSection() {
               <div className="flex-1 text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-2">
                   <Music2 className="w-4 h-4" />
-                  <span>Single Track</span>
+                  <span>{music.trackType}</span>
                 </div>
                 <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-2">
                   {music.trackTitle}
@@ -75,7 +76,7 @@ export default function MusicSection() {
 
                 {/* Streaming Buttons */}
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                  {music.platforms.map((p: any) => (
+                  {music.platforms.map((p) => (
                     <a
                       key={p.id}
                       href={p.url}

@@ -14,39 +14,25 @@ export default function SectionReveal({
   delayMs = 0,
 }: SectionRevealProps) {
   const [isVisible, setIsVisible] = useState(false);
-  // 'down': entering from bottom (downward scroll) -> start at +32px
-  // 'up': entering from top (upward scroll) -> start at -32px
+  // 'down': entering from bottom (downward scroll) -> start at +36px
+  // 'up': entering from top (upward scroll) -> start at -36px
   const [scrollDirection, setScrollDirection] = useState<'down' | 'up'>('down');
   const domRef = useRef<HTMLDivElement>(null);
-  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
-    lastScrollYRef.current = window.scrollY;
-
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (Math.abs(currentY - lastScrollYRef.current) > 3) {
-        setScrollDirection(currentY > lastScrollYRef.current ? 'down' : 'up');
-        lastScrollYRef.current = currentY;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
     const currentRef = domRef.current;
-    if (!currentRef) return () => window.removeEventListener('scroll', handleScroll);
+    if (!currentRef) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setIsVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
-          // If leaving from top, next time if we scroll up it drops from top (-32px)
-          // If leaving from bottom, next time if we scroll down it floats from bottom (+32px)
-          const rect = entry.boundingClientRect;
-          if (rect.top < 0) {
-            setScrollDirection('up');
-          } else {
-            setScrollDirection('down');
-          }
+          // Determine which edge the element exited from without needing a window scroll listener
+          setScrollDirection(entry.boundingClientRect.top < 0 ? 'up' : 'down');
         }
         setIsVisible(entry.isIntersecting);
       },
@@ -59,12 +45,10 @@ export default function SectionReveal({
     observer.observe(currentRef);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (currentRef) observer.unobserve(currentRef);
+      observer.unobserve(currentRef);
     };
   }, []);
 
-  // Natural wave translation offset based on scroll vector
   const initialTranslate = scrollDirection === 'down' ? 'translate-y-9' : '-translate-y-9';
 
   return (
