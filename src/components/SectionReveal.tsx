@@ -23,9 +23,14 @@ export default function SectionReveal({
     const currentRef = domRef.current;
     if (!currentRef) return;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setIsVisible(true);
-      return;
+    if (
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      const rafId = requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
+      return () => cancelAnimationFrame(rafId);
     }
 
     const observer = new IntersectionObserver(
@@ -46,6 +51,7 @@ export default function SectionReveal({
 
     return () => {
       observer.unobserve(currentRef);
+      observer.disconnect();
     };
   }, []);
 
@@ -57,7 +63,7 @@ export default function SectionReveal({
       style={{
         transitionDelay: isVisible ? `${delayMs}ms` : '0ms',
       }}
-      className={`transition-all duration-700 cubic-bezier(0.22, 1, 0.36, 1) transform will-change-transform ${
+      className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] transform will-change-transform motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:translate-y-0 motion-reduce:scale-100 motion-reduce:blur-none ${
         isVisible
           ? 'opacity-100 translate-y-0 scale-100 filter-none'
           : `opacity-0 ${initialTranslate} scale-[0.985] blur-[2px]`

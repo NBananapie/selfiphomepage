@@ -9,7 +9,9 @@ import { generateSdfForText, sampleSdfCpu, GLYPH_SPAN_RATIO } from './sdf';
 
 const framing = {
   scale(width: number, height: number): [number, number] {
-    const relative = (width / height) / (16 / 9);
+    const safeW = Math.max(1, width);
+    const safeH = Math.max(1, height);
+    const relative = (safeW / safeH) / (16 / 9);
     return relative < 1 ? [relative, 1] : [1, 1 / relative];
   },
 };
@@ -28,7 +30,6 @@ interface PowderParticle {
   grainSize: number; // diameter while resting in the pile, CSS px
   sharpness: number;
   phase: number;
-  swirlDir: number; // +1 or -1 for gentle orbital rotation
   target: number; // index into the glyph target list, -1 when not recruited
   charge: number; // 0..1, how strongly the field currently holds this grain
   glow: number; // 0..1, smoothed visual state (floating dust -> resting grain)
@@ -43,11 +44,6 @@ const SPRING_K = 0.09;
 const AIR_DRAG = 0.045; // per-frame velocity loss in flight
 const PILE_FRICTION = 0.38; // extra per-frame velocity loss once caught
 const MAX_SPEED = 18;
-
-function smoothstep(e0: number, e1: number, x: number) {
-  const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
-  return t * t * (3 - 2 * t);
-}
 
 export class ArgonRenderer {
   public canvas: HTMLCanvasElement;
@@ -92,7 +88,10 @@ export class ArgonRenderer {
     this.gl = gl;
 
     const compileShader = (type: number, src: string) => {
-      const shader = gl.createShader(type)!;
+      const shader = gl.createShader(type);
+      if (!shader) {
+        throw new Error('Failed to create WebGL shader.');
+      }
       gl.shaderSource(shader, src);
       gl.compileShader(shader);
       if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -106,21 +105,41 @@ export class ArgonRenderer {
     const linkProgram = (vsSrc: string, fsSrc: string) => {
       const vs = compileShader(gl.VERTEX_SHADER, vsSrc);
       const fs = compileShader(gl.FRAGMENT_SHADER, fsSrc);
-      const program = gl.createProgram()!;
-      gl.attachShader(program, vs);
-      gl.attachShader(program, fs);
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        const info = gl.getProgramInfoLog(program);
-        throw new Error(`Program link error: ${info}`);
+      const program = gl.createProgram();
+      if (!program) {
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+        throw new Error('Failed to create WebGL program.');
       }
-      return program;
+      try {
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          const info = gl.getProgramInfoLog(program);
+          gl.deleteProgram(program);
+          throw new Error(`Program link error: ${info}`);
+        }
+        return program;
+      } finally {
+        gl.detachShader(program, vs);
+        gl.detachShader(program, fs);
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+      }
     };
 
     this.program = linkProgram(vertexShaderSource, fragmentShaderSource);
     this.particleProgram = linkProgram(particleVertexShaderSource, particleFragmentShaderSource);
 
-    this.quadBuffer = gl.createBuffer()!;
+    const quadBuffer = gl.createBuffer();
+    const particleBuffer = gl.createBuffer();
+    const noiseTexture = gl.createTexture();
+    if (!quadBuffer || !particleBuffer || !noiseTexture) {
+      throw new Error('Failed to allocate WebGL buffers or textures.');
+    }
+
+    this.quadBuffer = quadBuffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.quadBuffer);
     gl.bufferData(
       gl.ARRAY_BUFFER,
@@ -128,7 +147,7 @@ export class ArgonRenderer {
       gl.STATIC_DRAW
     );
 
-    this.particleBuffer = gl.createBuffer()!;
+    this.particleBuffer = particleBuffer;
     this.particleData = new Float32Array(NUM_PARTICLES * FLOATS_PER_PARTICLE);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.particleBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, this.particleData.byteLength, gl.DYNAMIC_DRAW);
@@ -147,7 +166,6 @@ export class ArgonRenderer {
         grainSize: 1.6 + Math.random() * 2.0,
         sharpness: 0.45 + Math.random() * 0.45,
         phase: Math.random() * Math.PI * 2,
-        swirlDir: (i % 2 === 0 ? 1 : -1) * (0.8 + Math.random() * 0.4),
         target: -1,
         charge: 0,
         glow: 0,
@@ -184,7 +202,7 @@ export class ArgonRenderer {
       darkMode: gl.getUniformLocation(this.particleProgram, 'darkMode'),
     };
 
-    this.noiseTexture = gl.createTexture()!;
+    this.noiseTexture = noiseTexture;
     gl.bindTexture(gl.TEXTURE_2D, this.noiseTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -436,7 +454,9 @@ export class ArgonRenderer {
     const hoverY = interaction.hover[1] * h;
     const hoverAmount = interaction.hoverAmount;
     const isHoverActive = !this.gathering && hoverAmount > 0.02;
-    const hoverRadius = 220 * dpr;
+    const hoverSigma = 140 * dpr;
+    const twoHoverSigmaSq = 2 * hoverSigma * hoverSigma;
+    const maxHoverDistSq = (hoverSigma * 3) * (hoverSigma * 3);
 
     for (let i = 0; i < this.particles.length; i++) {
       const q = this.particles[i];
@@ -491,22 +511,10 @@ export class ArgonRenderer {
 
           glowTarget = q.charge * (0.4 + 0.6 * capture);
         } else {
-          // 2. UNRECRUITED AMBIENT PARTICLES: Calmly floating in the surrounding space without swirling/circling
-          // 彻底取消外围圆环旋转与强心引力，剩余粒子缓慢悠闲地漂浮在四周
+          // 2. UNRECRUITED AMBIENT PARTICLES: Calmly floating in the surrounding space without any circular boundary
           const drag = Math.pow(0.965, f);
           q.vx = q.vx * drag + ambVx * 0.45 * f;
           q.vy = q.vy * drag + ambVy * 0.45 * f;
-
-          // 仅在接近"干"字内部粉床与笔画区时给予极轻柔的外推，防止杂质侵入文字中心镂空
-          const dx = q.x - this.anchorX;
-          const dy = q.y - this.anchorY;
-          const r = Math.hypot(dx, dy) + 1e-3;
-          const avoidR = box * 0.55;
-          if (r < avoidR) {
-            const push = 0.28 * dpr * (1 - r / avoidR) * f;
-            q.vx += (dx / r) * push;
-            q.vy += (dy / r) * push;
-          }
 
           const speed = Math.hypot(q.vx, q.vy);
           const maxCalmSpeed = maxSpeed * 0.25;
@@ -516,56 +524,28 @@ export class ArgonRenderer {
             q.vy *= s;
           }
 
-          // 外围粒子保持自然暗调环境微光，不产生发光圆环
           glowTarget = 0;
         }
       } else {
         // === IDLE / HOVER STATE ===
-        // Normal ambient drift + 3D volumetric spherical rolling / drifting within a circular domain
+        // Purely Cartesian, zero-divergence gentle breeze with smooth Gaussian spatial decay (zero circular/ring forces)
         let ax = 0;
         let ay = 0;
 
         if (isHoverActive) {
           const dx = hoverX - q.x;
           const dy = hoverY - q.y;
-          const r = Math.hypot(dx, dy) + 1e-3;
+          const rSq = dx * dx + dy * dy;
 
-          if (r < hoverRadius) {
-            const normR = r / hoverRadius;
-            const s = 1 - normR;
+          if (rSq < maxHoverDistSq) {
+            const wHover = Math.exp(-rSq / twoHoverSigmaSq) * hoverAmount;
+            const wavePhase = tSlow * 1.25 + q.phase * 2.3;
+            const waveX = Math.sin(wavePhase + cy * 0.008) * Math.cos(tSlow * 0.85 + q.phase);
+            const waveY = Math.cos(wavePhase * 0.9 + cx * 0.008) * Math.sin(tSlow * 0.8 + q.phase * 1.4);
+            const amp = (0.045 + 0.035 * q.depth) * dpr * wHover;
 
-            // 1. 模拟三维立体球面内的往复滚动与漫游（3D volumetric oscillation & rolling）
-            // 彻底去除固定圆周单向绕圈(fSwirl)，而是沿空间曲面经纬方向来回翻滚穿梭
-            const rollPhase = tSlow * 1.5 + q.phase * 2.8;
-            // 粒子深度分为前后两层，前后层产生对流交错往复运动，视觉上呈现球体来回滚动
-            const zSign = q.depth > 0.5 ? 1.0 : -1.0;
-
-            // 往复切向翻滚速度（正弦波正负振荡，顺时针滚动后逆时针滚回）
-            const rollTangential = Math.sin(rollPhase) * zSign * 0.18 * dpr * hoverAmount;
-            // 往复径向穿梭（在圆心与边缘之间来回游动浮动）
-            const rollRadial = Math.cos(rollPhase * 0.8 + q.phase) * 0.14 * dpr * hoverAmount;
-
-            // 2. 空间圆/球面范围软边界约束（Soft boundary keeping particles rolling within the sphere）
-            let fBoundary = 0;
-            if (normR > 0.65) {
-              // 靠近外圈边缘时柔和弹性回弹向心，约束粒子在圆范围内滚动，不飞散
-              fBoundary = 0.12 * dpr * Math.pow((normR - 0.65) / 0.35, 1.4) * hoverAmount;
-            } else if (r < 28 * dpr) {
-              // 靠近中心时微弱排斥缓冲，避免粒子过度聚集成死核
-              fBoundary = -0.06 * dpr * (1 - r / (28 * dpr)) * hoverAmount;
-            }
-
-            // 3. 轻微的整体聚集倾向（"变得密集一点点 但不要太密集"）
-            const fGentleGather = 0.035 * dpr * s * hoverAmount;
-
-            const radialForce = fBoundary + fGentleGather + rollRadial;
-            const tangentialForce = rollTangential;
-
-            ax = (dx / r) * radialForce + (-dy / r) * tangentialForce;
-            ay = (dy / r) * radialForce + (dx / r) * tangentialForce;
-
-            // 伴随微弱的粉末光泽
-            glowTarget = Math.max(glowTarget, 0.16 * s * hoverAmount);
+            ax = waveX * amp;
+            ay = waveY * amp;
           }
         }
 

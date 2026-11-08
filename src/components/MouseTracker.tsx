@@ -55,7 +55,7 @@ export default function MouseTracker() {
       targetX = e.clientX;
       targetY = e.clientY;
 
-      const target = e.target as HTMLElement | null;
+      const target = e.target instanceof Element ? e.target : null;
       isHoveringNav = Boolean(target?.closest('header'));
       scheduleRender();
     };
@@ -64,6 +64,10 @@ export default function MouseTracker() {
       targetX = -1000;
       targetY = -1000;
       spotlight.style.opacity = '0';
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });

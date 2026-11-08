@@ -232,7 +232,10 @@ export function generateSdfForText(text: string, size = 512): SdfEntry {
   const normCanvas = document.createElement('canvas');
   normCanvas.width = size;
   normCanvas.height = size;
-  const nctx = normCanvas.getContext('2d', { willReadFrequently: true })!;
+  const nctx = normCanvas.getContext('2d', { willReadFrequently: true });
+  if (!nctx) {
+    return emptyEntry(key, size);
+  }
   nctx.clearRect(0, 0, size, size);
 
   if (maxX >= minX && maxY >= minY) {

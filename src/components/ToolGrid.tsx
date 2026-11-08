@@ -91,9 +91,9 @@ export default function ToolGrid() {
                   {cardInner}
                 </a>
               ) : (
-                <div role="article" aria-disabled="true" className="block h-full select-none">
+                <article className="block h-full select-none">
                   {cardInner}
-                </div>
+                </article>
               )}
             </SectionReveal>
           );

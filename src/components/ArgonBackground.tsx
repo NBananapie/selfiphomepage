@@ -26,6 +26,18 @@ export default function ArgonBackground() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const w = Math.max(1, window.innerWidth);
+      const h = Math.max(1, window.innerHeight);
+      canvas.width = Math.max(1, Math.floor(w * dpr));
+      canvas.height = Math.max(1, Math.floor(h * dpr));
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+    };
+
+    resize();
+
     let renderer: ArgonRenderer | null = null;
     const initRenderer = () => {
       try {
@@ -39,7 +51,7 @@ export default function ArgonBackground() {
     initRenderer();
     if (!renderer) return;
 
-    let animationFrameId: number;
+    let animationFrameId: number | null = null;
     const startTime = performance.now();
 
     const config: ArgonConfig = {
@@ -105,17 +117,6 @@ export default function ArgonBackground() {
     let targetHoverUV: [number, number] = [0.5, 0.5];
     let isHovering = false;
 
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
-    };
-
-    resize();
     window.addEventListener('resize', resize, { passive: true });
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -139,8 +140,8 @@ export default function ArgonBackground() {
       if (e.pointerType === 'mouse' && e.button !== 0) {
         return;
       }
-      const target = e.target as HTMLElement | null;
-      if (target?.closest('a, button, [role="dialog"]')) {
+      const target = e.target instanceof Element ? e.target : null;
+      if (target?.closest('a, button, input, textarea, select, label, [role="button"], [role="dialog"]')) {
         return;
       }
       isPointerDown = true;
@@ -171,12 +172,22 @@ export default function ArgonBackground() {
 
     const handleContextLost = (e: Event) => {
       e.preventDefault();
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
     };
 
     const handleContextRestored = () => {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      resize();
       initRenderer();
-      animationFrameId = requestAnimationFrame(renderLoop);
+      if (renderer) {
+        animationFrameId = requestAnimationFrame(renderLoop);
+      }
     };
 
     canvas.addEventListener('webglcontextlost', handleContextLost);
@@ -223,7 +234,9 @@ export default function ArgonBackground() {
     animationFrameId = requestAnimationFrame(renderLoop);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
       document.body.style.userSelect = '';
       canvas.removeEventListener('webglcontextlost', handleContextLost);
       canvas.removeEventListener('webglcontextrestored', handleContextRestored);

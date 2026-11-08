@@ -1,21 +1,26 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 
+const emptySubscribe = () => () => {};
+
 export default function Header() {
   const { language, setLanguage } = useLanguage();
   const { theme, resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const [isScrolled, setIsScrolled] = useState(false);
 
   const isDark = (resolvedTheme || theme) === 'dark';
 
   useEffect(() => {
-    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 30);
     };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useSyncExternalStore } from 'react';
 import { translations, Language, TranslationSchema } from '../i18n/translations';
 
 interface LanguageContextType {
@@ -9,30 +9,76 @@ interface LanguageContextType {
   t: TranslationSchema;
 }
 
+const STORAGE_KEY = 'app-language';
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+let cachedClientLang: Language | null = null;
+const listeners = new Set<() => void>();
+
+function detectClientLanguage(): Language {
+  if (cachedClientLang) {
+    return cachedClientLang;
+  }
+  if (typeof window === 'undefined') {
+    return 'zh';
+  }
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved === 'en' || saved === 'zh') {
+      cachedClientLang = saved;
+      return saved;
+    }
+  } catch {
+    // Ignore storage access errors in private browsing or restricted WebViews
+  }
+  const navLang = typeof navigator !== 'undefined' && navigator.language ? navigator.language.toLowerCase() : 'zh';
+  cachedClientLang = navLang.startsWith('zh') ? 'zh' : 'en';
+  return cachedClientLang;
+}
+
+function subscribeLanguage(listener: () => void) {
+  listeners.add(listener);
+  const handleStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY && (e.newValue === 'en' || e.newValue === 'zh')) {
+      cachedClientLang = e.newValue;
+      listener();
+    }
+  };
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', handleStorage);
+  }
+  return () => {
+    listeners.delete(listener);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('storage', handleStorage);
+    }
+  };
+}
+
+function getServerLanguage(): Language {
+  return 'zh';
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('zh');
+  const language = useSyncExternalStore(subscribeLanguage, detectClientLanguage, getServerLanguage);
 
   useEffect(() => {
-    const saved = localStorage.getItem('app-language') as Language | null;
-    const initialLang: Language =
-      saved === 'en' || saved === 'zh'
-        ? saved
-        : navigator.language.toLowerCase().startsWith('zh')
-        ? 'zh'
-        : 'en';
-    setLanguageState(initialLang);
-    document.documentElement.lang = initialLang === 'zh' ? 'zh-CN' : 'en';
+    document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
+  }, [language]);
+
+  const setLanguage = useCallback((lang: Language) => {
+    const validLang: Language = lang === 'en' ? 'en' : 'zh';
+    cachedClientLang = validLang;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, validLang);
+    } catch {
+      // Ignore storage write errors in restricted environments
+    }
+    document.documentElement.lang = validLang === 'zh' ? 'zh-CN' : 'en';
+    listeners.forEach((l) => l());
   }, []);
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem('app-language', lang);
-    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-  };
-
-  const t = translations[language];
+  const t = translations[language] ?? translations.zh;
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
