@@ -7,6 +7,8 @@ export interface ToolItem {
   description: string;
   url: string;
   icon: string;
+  iconImage?: string;
+  highlights?: string[];
   statusKey: ToolStatusKey;
 }
 
@@ -123,10 +125,12 @@ export const translations: Record<Language, TranslationSchema> = {
       items: [
         {
           id: 'ai-translator',
-          name: 'AI Translator',
-          description: 'A lightning-fast, highly accurate document and PDF translation tool powered by state-of-the-art LLMs.',
+          name: 'AI Book Translator',
+          description: 'Read foreign PDFs side-by-side with instant translations, inline AI explanations, and effortless highlights.',
           url: 'https://aitranslator.justganit.com/',
           icon: '🌐',
+          iconImage: '/yueyi-icon.svg',
+          highlights: ['Side-by-Side PDF', 'AI Companion', 'Encrypted Sync'],
           statusKey: 'statusLive',
         },
         {
@@ -310,10 +314,12 @@ export const translations: Record<Language, TranslationSchema> = {
       items: [
         {
           id: 'ai-translator',
-          name: 'AI 沉浸式翻译',
-          description: '基于前沿大语言模型（LLM）驱动的极速、高精度的文档与 PDF 沉浸式翻译工具。',
+          name: '阅译 · AI Book Translator',
+          description: '左看外文原版、右读中文译文，划词就能问 AI、记书摘，读外文书就像读母语一样顺手。',
           url: 'https://aitranslator.justganit.com/',
           icon: '🌐',
+          iconImage: '/yueyi-icon.svg',
+          highlights: ['双栏对照', 'AI 伴读', '多端加密同步'],
           statusKey: 'statusLive',
         },
         {

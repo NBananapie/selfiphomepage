@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import GlassCard from './GlassCard';
 import SectionReveal from './SectionReveal';
 import { useLanguage } from '@/context/LanguageContext';
@@ -42,15 +43,39 @@ export default function ToolGrid() {
                   {statusText}
                 </span>
               </div>
-              <div className="text-5xl mb-6 mt-4 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
-                {tool.icon}
+              <div className="mb-6 mt-4 w-fit origin-left group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
+                {tool.iconImage ? (
+                  <Image
+                    src={tool.iconImage}
+                    alt={tool.name}
+                    width={52}
+                    height={52}
+                    className="w-[52px] h-[52px] rounded-xl shadow-md"
+                  />
+                ) : (
+                  <div className="text-5xl leading-none">{tool.icon}</div>
+                )}
               </div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                 {tool.name}
               </h3>
-              <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed flex-grow">
-                {tool.description}
-              </p>
+              <div className="flex-grow flex flex-col">
+                <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+                  {tool.description}
+                </p>
+                {tool.highlights && tool.highlights.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {tool.highlights.map(tag => (
+                      <span
+                        key={tag}
+                        className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-900/5 dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-900/10 dark:border-white/10"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               <div
                 className={`mt-8 flex items-center font-bold text-sm ${

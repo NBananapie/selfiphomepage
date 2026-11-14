@@ -12,12 +12,14 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://justganit.com"),
   title: "JustGanIt | Gan's AI Toolkit & Creative Space",
   description:
-    "Building AI-driven tools to enhance productivity and simplify the complex. Explore AI Translator, LLM Poker Arena, creative music, and insights by Gan.",
+    "Building AI-driven tools to enhance productivity and simplify the complex. Explore AI Book Translator, LLM Poker Arena, creative music, and insights by Gan.",
   keywords: [
     "JustGanIt",
     "Gan",
     "AI Tools",
     "AI Translator",
+    "AI Book Translator",
+    "阅译",
     "LLM Poker Arena",
     "Full-Stack Developer",
     "Next.js",
